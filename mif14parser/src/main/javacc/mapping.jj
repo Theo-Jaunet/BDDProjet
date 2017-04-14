@@ -1,0 +1,189 @@
+options{
+
+}
+
+PARSER_BEGIN(MappingParser)
+package fr.univlyon1.mif37.dex.parser;
+
+import fr.univlyon1.mif37.dex.mapping.*;
+import java.util.*;
+
+
+public class MappingParser {
+}
+
+PARSER_END(MappingParser)
+
+/**
+ * Comments starts with -- and finish at the end of the line
+ */
+SKIP:
+{
+  " "
+ |"\t"
+ |"\n"
+ |"\r"
+ |<"--"(~["\n","\r"])*("\n"|"\r"|"\r\n")>
+}
+
+TOKEN[IGNORE_CASE]: /* Keywords */
+{
+     <MAPPING:"MAPPING">
+    |<EDB:"EDB">
+    |<IDB:"IDB">
+    |<NEG:"NEG">
+}
+
+TOKEN: /* Numeric constants */
+{
+     <CONSTANT: (["0"-"9"])+("."(["0"-"9"])*)?>
+}
+
+TOKEN: /* Names */
+{
+    <IDENTIFIER:<LETTER>(<LETTER>|<DIGIT>)*>
+   |<#LETTER:["_","a"-"z","A"-"Z"]>
+   |<#DIGIT:["0"-"9"]>
+   |<VARIABLE:"$"<IDENTIFIER>>
+}
+
+
+/** Rules */
+
+Mapping mapping():
+{
+    Collection<Relation> sourceRelations;
+    Collection<AbstractRelation> targetRelations;
+    Collection<Tgd> tgds;
+}
+{
+    <EDB> sourceRelations = tables()
+    <IDB> targetRelations = tablesIDB()
+    <MAPPING> tgds = tgds()
+    { return new Mapping(sourceRelations,targetRelations,tgds); }
+}
+
+Collection<Relation> tables():
+{
+    Token t;
+    Collection<Relation> result = new ArrayList<Relation>();
+    List<String> args;
+    String name;
+}
+{
+    (
+        t=<IDENTIFIER> "(" {
+            name = t.image;
+            args = new ArrayList<String>();
+        }
+            t = <IDENTIFIER> { args.add(t.image); }
+            ("," t = <IDENTIFIER> { args.add(t.image); })*
+        ")" { result.add(new Relation(name,args)); }
+    )+
+    { return result; }
+}
+
+Collection<AbstractRelation> tablesIDB():
+{
+    Token t;
+    Collection<AbstractRelation> result = new ArrayList<AbstractRelation>();
+    List<AbstractArgument> args;
+    String name;
+}
+{
+    (
+        t=<IDENTIFIER> "(" {
+            name = t.image;
+            args = new ArrayList<AbstractArgument>();
+        }
+            (t = <IDENTIFIER> { args.add(new AbstractArgument(t.image)); } |
+            t = <VARIABLE> { args.add(new AbstractArgument(new Variable(t.image))); })
+            ("," 
+               (t = <IDENTIFIER> { args.add(new AbstractArgument(t.image)); } |
+                t = <VARIABLE> { args.add(new AbstractArgument(new Variable(t.image))); })
+            )*
+        ")" { result.add(new AbstractRelation(name,args)); }
+    )+
+    { return result; }
+}
+
+Collection<Tgd> tgds():
+{
+    Collection<Tgd> result = new ArrayList<Tgd>();
+    Tgd tgd;
+}
+{
+    ( tgd = tgd() { result.add(tgd); } )+
+    { return result; }
+}
+
+Tgd tgd():
+{
+    Collection<Literal> left;
+    Atom right;
+    Tgd tgd;
+}
+{
+    left=conjunctiveQuery()
+    "->"
+    right=atom()
+    (".")?
+    { 
+      tgd = new Tgd(left,right);
+      if (!tgd.isSafe()) {
+        throw generateParseException();
+      }
+      return tgd; 
+    }
+}
+
+
+
+
+Collection<Literal> conjunctiveQuery():
+{
+    Collection<Literal> result = new ArrayList<Literal>();
+    Literal a;
+}
+{
+    a=literal() { result.add(a); }
+    ( "," a=literal() { result.add(a); })*
+    { return result; }
+}
+
+Atom atom():
+{
+    String name;
+    List<Value> args = new ArrayList<Value>();
+    Value v;
+    Token t;
+}
+{
+    t=<IDENTIFIER> "(" { name = t.image; }
+    v = value() { args.add(v); }
+    ("," v = value() { args.add(v); })*
+    ")"
+    { return new Atom(name, args); }
+}
+
+
+Literal literal():
+{
+    Atom a;
+    Token t;
+}
+{
+  a = atom() { return new Literal(a, true);  } |
+  <NEG> a = atom() { return new Literal(a, false);  }
+}
+
+
+Value value():
+{
+    Token t;
+}
+{
+      t=<VARIABLE> { return new Variable(t.image); }
+    | t=<CONSTANT> { return Constant.parse(t.image); }
+}
+

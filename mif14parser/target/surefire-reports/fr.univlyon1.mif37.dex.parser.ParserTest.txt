@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: fr.univlyon1.mif37.dex.parser.ParserTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.18 sec - in fr.univlyon1.mif37.dex.parser.ParserTest

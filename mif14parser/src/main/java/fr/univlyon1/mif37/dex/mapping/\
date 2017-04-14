@@ -1,0 +1,10 @@
+package fr.univlyon1.mif37.dex.mapping;
+
+import java.util.List;
+
+public class Literal {
+
+  private Atom a;
+  private Boolean flag;
+   
+}
