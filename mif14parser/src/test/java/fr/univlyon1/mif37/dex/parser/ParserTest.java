@@ -13,7 +13,7 @@ public class ParserTest {
 
     @Test
     public void testSample() throws ParseException {
-        Reader input = new InputStreamReader(ParserTest.class.getResourceAsStream("/sample-mapping.txt"));
+        Reader input = new InputStreamReader(ParserTest.class.getResourceAsStream("/fr/univlyon1/mif37/dex/sample-mapping.txt"));
         MappingParser parser = new MappingParser(input);
         Mapping m = parser.mapping();
         assertNotNull(m);
