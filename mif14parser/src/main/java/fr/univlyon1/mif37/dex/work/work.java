@@ -24,10 +24,11 @@ public class work {
             if (this.strat()) {
                 return "stratified";
             } else if (this.semi()) {
-
+                return "semi";
+            } else {
+                return "pos";
             }
         }
-
         return "";
     }
 
@@ -54,7 +55,6 @@ public class work {
                 if (!flag && m.getIDB().contains(name) && this.safeExtend()) {
                     return true;
                 }
-
 
                 return false;
             }
@@ -121,6 +121,6 @@ public class work {
         }
         return res;
     }
-
+    
 
 }
