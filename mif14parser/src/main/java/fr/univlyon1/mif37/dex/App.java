@@ -1,17 +1,21 @@
 package fr.univlyon1.mif37.dex;
 
+import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
+import fr.univlyon1.mif37.dex.mapping.Tgd;
 import fr.univlyon1.mif37.dex.parser.MappingParser;
 import fr.univlyon1.mif37.dex.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
-    public static void main(String[] args) throws ParseException, FileNotFoundException {
-        Reader input = new InputStreamReader(new FileInputStream(new File("/home/theo/Documents/bdd/BDDProjet/BDDProjet/mif14parser/src/main/java/fr/univlyon1/mif37/dex/sample-mapping.txt")));
+    public static void main(String[] args) throws ParseException, IOException {
+
+        Reader input = new InputStreamReader(new FileInputStream(new File("sample-mapping.txt")));
         MappingParser parser = new MappingParser(input);
         Mapping m = parser.mapping();
         // MappingParser mp = new MappingParser(System.in);
@@ -21,5 +25,13 @@ public class App {
                 m.getIDB().size(),
                 m.getTgds().size());
         System.out.println(m.getEDB().size());
+
+        Object[] canard = m.getTgds().toArray();
+        Tgd temp = (Tgd) canard[4];
+
+        for (Literal lit: temp.getLeft()) {
+            System.out.println(lit.getAtom().getName());
+            System.out.println(lit.getFlag());
+        }
     }
 }
