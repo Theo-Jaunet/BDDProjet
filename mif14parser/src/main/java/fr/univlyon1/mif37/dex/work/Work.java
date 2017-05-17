@@ -3,18 +3,21 @@ package fr.univlyon1.mif37.dex.work;
 import fr.univlyon1.mif37.dex.mapping.Atom;
 import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
+import fr.univlyon1.mif37.dex.mapping.Relation;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
+import fr.univlyon1.mif37.dex.mapping.Variable;
 
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Created by theo on 4/21/17.
  */
-public class Work {
+public final class Work {
     
     Mapping m;
     String type;
@@ -215,8 +218,15 @@ public class Work {
         
         for(Integer i = 1; i<= nbpart; i++){
             for(HashMap.Entry<String, Integer> entry : this.stratum.entrySet()) {
-                if(entry.getValue() == i){
-                    this.partitions.put(i, this.getDefs(entry.getKey()));
+                if(Objects.equals(entry.getValue(), i)){
+                    ArrayList<Tgd> tmpTgd;
+                    if(this.partitions.containsKey(i)){
+                        tmpTgd = this.partitions.get(i);
+                    }else{
+                        tmpTgd = new ArrayList();
+                    }
+                    tmpTgd.addAll(this.getDefs(entry.getKey()));
+                    this.partitions.put(i, tmpTgd);
                 }
             }
         }     
@@ -245,5 +255,46 @@ public class Work {
             System.out.println(afficher);
         }
         );
+    }
+    
+    public ArrayList<Relation> evalPartition(ArrayList<Tgd> partition, ArrayList<Relation> edb){
+        ArrayList<Relation> tmp = edb;
+        HashSet<String> names = new HashSet();
+        HashMap<String, HashSet<String>> adom = new HashMap();
+        String tmpString;
+        HashSet<String> tmpSet;
+        
+        for(Tgd tgd : partition){
+           for(Literal lit : tgd.getLeft()){
+               for(int i = 0; i<lit.getAtom().getVars().size(); i++){
+                   
+                    tmpString = lit.getAtom().getVars().toArray()[i].toString();
+                    
+                    if(adom.containsKey(tmpString)){
+                       tmpSet = adom.get(tmpString);
+                    }else{
+                       tmpSet = new HashSet();
+                    }
+                    
+                    for(Relation rel : tmp){
+                        if(lit.getAtom().getName().equals(rel.getName())){
+                            String lol = rel.getAttributes()[i];
+                            tmpSet.add(lol);
+                        }
+                    }
+                    adom.put(tmpString, tmpSet);
+               }
+           }
+           /*tmp.forEach((rel)->{
+               if(names.contains(rel.getName())){
+                   adom.put(rel.getName(), );
+               }
+           });*/
+        }
+        return edb;
+    }
+    
+    public void test(){
+        this.evalPartition(this.partitions.get(1), (ArrayList)this.m.getEDB());
     }
 }
