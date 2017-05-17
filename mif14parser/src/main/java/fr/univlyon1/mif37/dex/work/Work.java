@@ -1,25 +1,48 @@
 package fr.univlyon1.mif37.dex.work;
 
+import fr.univlyon1.mif37.dex.mapping.Atom;
 import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by theo on 4/21/17.
  */
-public class work {
+public class Work {
+    
     Mapping m;
     String type;
+    HashMap<String, Integer> stratum;
+    HashMap<Integer, ArrayList<Tgd>> partitions;
 
-    public work(Mapping m) {
-        this.m = m;
-        this.type = characterize();
+    public Mapping getM() {
+        return m;
     }
 
-    public String characterize() {
+    public String getType() {
+        return type;
+    }
+
+    public HashMap<String, Integer> getStratum() {
+        return stratum;
+    }
+    
+    public Work(Mapping m) {
+        this.stratum = new HashMap<>();
+        this.partitions = new HashMap();
+        this.m = m;
+        this.type = characterize();
+        this.stratification();
+        this.partitioning();
+    }
+
+    private String characterize() {
         if (allSafe()) {
             if (this.strat()) {
                 return "stratified";
@@ -29,13 +52,14 @@ public class work {
                 return "pos";
             }
         }
+        System.out.println("lol");
         return "";
     }
 
     public Boolean allSafe() {
 
         for (Tgd tgd : m.getTgds()) {
-            if (tgd.isSafe()) {
+            if (!tgd.isSafe()) {
                 return false;
             }
         }
@@ -43,20 +67,21 @@ public class work {
     }
 
     public Boolean strat() {
+        
+        HashSet<String> list = new HashSet<>();
+        m.getIDB().forEach((R) -> {
+            list.add(R.getName());
+        });
 
         for (Tgd tgd : m.getTgds()) {
             for (Literal lit : tgd.getLeft()) {
                 String name = lit.getAtom().getName();
                 Boolean flag = lit.getFlag();
-                Boolean test = false;
-                System.out.println(lit.getAtom().getName());
-                System.out.println(lit.getFlag());
-
-                if (!flag && m.getIDB().contains(name) && this.safeExtend()) {
+                
+                // pb du contains
+                if (!flag && list.contains(name) && this.safeExtend()) {
                     return true;
                 }
-
-                return false;
             }
 
         }
@@ -64,23 +89,25 @@ public class work {
     }
 
     public Boolean semi() {
+        
+        HashSet<String> list = new HashSet<>();
+        m.getEDB().forEach((R) -> {
+            list.add(R.getName());
+        });
 
         for (Tgd tgd : m.getTgds()) {
             for (Literal lit : tgd.getLeft()) {
                 String name = lit.getAtom().getName();
                 Boolean flag = lit.getFlag();
 
-                System.out.println(lit.getAtom().getName());
-                System.out.println(lit.getFlag());
-                if (!flag && m.getEDB().contains(name)) {
+                //System.out.println(lit.getAtom().getName());
+                //System.out.println(lit.getFlag());
+                if (!flag && list.contains(name)) {
 
                     return true;
                 }
             }
-
         }
-
-
         return false;
     }
 
@@ -101,14 +128,12 @@ public class work {
 
             if (lit.getFlag() && neg.contains(lit.getAtom().getName()) ) {
                 neg.remove(lit.getAtom().getName());
-
             }
         }
         if (neg.size() > 0){
             return false;
         }else
             return true;
-
     }
 
 
@@ -122,5 +147,103 @@ public class work {
         return res;
     }
     
-
+    public void stratification(){
+        
+        Boolean change = true;
+        Integer nbStratum = 1, 
+                predicateCount,
+                tmp, actualStratum;
+        Atom p, q;
+        
+        for(Tgd tgd : this.m.getTgds()){
+            
+            for(Literal lit : tgd.getLeft()){
+                this.stratum.put(lit.getAtom().getName(), 1);
+            }
+                this.stratum.put(tgd.getRight().getName(), 1);
+        }
+        predicateCount = this.stratum.size();
+        
+        while(change && nbStratum < predicateCount){
+            change = false;
+            for( Tgd tgd : m.getTgds()){
+                
+                p = tgd.getRight();
+                actualStratum = this.stratum.get(p.getName());
+                
+                for (Literal lit : tgd.getLeft()){
+                  
+                    if(!lit.getFlag()){
+                        tmp = Integer.max(this.stratum.get(lit.getAtom().getName()) + 1,
+                                this.stratum.get(p.getName()));
+                        if (tmp > actualStratum){
+                            this.stratum.put(p.getName(), tmp);
+                            change = true;
+                        } 
+                        
+                    }else{
+                        tmp = Integer.max(this.stratum.get(lit.getAtom().getName()),
+                                this.stratum.get(p.getName()));
+                        if (tmp > actualStratum){
+                            //System.out.println(tmp);
+                            this.stratum.put(p.getName(), tmp);
+                            change = true;
+                        } 
+                    }
+                    if (actualStratum > nbStratum){
+                        nbStratum = actualStratum;
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    public void afficher_stratum(){
+        System.out.println(this.stratum.size());
+        this.stratum.forEach((k,v) -> {
+            String afficher = k;
+            afficher += " : ";
+            afficher += v.toString();
+            System.out.println(afficher);
+        }
+        );
+    }
+    
+    public void partitioning(){
+        Integer nbpart = Collections.max(this.stratum.values());
+        
+        for(Integer i = 1; i<= nbpart; i++){
+            for(HashMap.Entry<String, Integer> entry : this.stratum.entrySet()) {
+                if(entry.getValue() == i){
+                    this.partitions.put(i, this.getDefs(entry.getKey()));
+                }
+            }
+        }     
+    }
+    
+    public ArrayList<Tgd> getDefs(String head){
+        ArrayList<Tgd> result = new ArrayList<>();
+        this.stratum.forEach((key, val)->{
+            if(key.equals(head)){
+                m.getTgds().forEach((tgd) ->{
+                    if(tgd.getRight().getName().equals(head)){
+                        result.add(tgd);
+                    }
+                });
+            }
+        });
+        return result;
+    }
+    
+    public void afficher_partitions(){
+        System.out.println(this.partitions.size());
+        this.partitions.forEach((k,v) -> {
+            String afficher = k.toString();
+            afficher += " : ";
+            afficher += v.toString();
+            System.out.println(afficher);
+        }
+        );
+    }
 }
