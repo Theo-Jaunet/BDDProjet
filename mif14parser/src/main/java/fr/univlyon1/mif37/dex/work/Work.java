@@ -21,7 +21,7 @@ public final class Work {
     String type;
     HashMap<String, Integer> stratum;
     HashMap<Integer, ArrayList<Tgd>> partitions;
-    HashMap<String, HashMap<String, ArrayList<String>>> result;
+
 
     public Mapping getM() {
         return m;
@@ -42,7 +42,6 @@ public final class Work {
         this.type = characterize();
         this.stratification();
         this.partitioning();
-        this.result = new HashMap<>();
     }
 
     private String characterize() {
@@ -55,7 +54,6 @@ public final class Work {
                 return "pos";
             }
         }
-        System.out.println("lol");
         return "";
     }
 
@@ -203,7 +201,6 @@ public final class Work {
     }
 
     public void afficher_stratum() {
-        System.out.println(this.stratum.size());
         this.stratum.forEach((k, v) -> {
                     String afficher = k;
                     afficher += " : ";
@@ -257,43 +254,24 @@ public final class Work {
         );
     }
 
-    public ArrayList<Relation> evalPartition(ArrayList<Tgd> partition, ArrayList<Relation> edb) {
-        ArrayList<Relation> tmp = edb;
-        HashSet<String> names = new HashSet();
-        HashMap<String, HashSet<String>> adom = new HashMap();
-        String tmpString;
-        HashSet<String> tmpSet;
-
-        for (Tgd tgd : partition) {
-            for (Literal lit : tgd.getLeft()) {
-                for (int i = 0; i < lit.getAtom().getVars().size(); i++) {
-
-                    tmpString = lit.getAtom().getVars().toArray()[i].toString();
-
-                    if (adom.containsKey(tmpString)) {
-                        tmpSet = adom.get(tmpString);
-                    } else {
-                        tmpSet = new HashSet();
-                    }
-
-                    for (Relation rel : tmp) {
-                        if (lit.getAtom().getName().equals(rel.getName())) {
-                            String lol = rel.getAttributes()[i];
-                            tmpSet.add(lol);
-                        }
-                    }
-                    adom.put(tmpString, tmpSet);
+    public void megaEval(ArrayList<Relation> edb){
+        ArrayList<Relation> oldEdb = new ArrayList<>(edb);
+        Boolean change = true;
+        for (Map.Entry<Integer, ArrayList<Tgd>> entry : this.partitions.entrySet()) {
+            do {
+                for (Tgd clause : entry.getValue()){
+                    edb =this.eval(clause,edb);
                 }
-            }
-           /*tmp.forEach((rel)->{
-               if(names.contains(rel.getName())){
-                   adom.put(rel.getName(), );
-               }
-           });*/
-        }
-        return edb;
-    }
+                if(edb.equals(oldEdb)){
+                    change=false;
+                }else{
+                    oldEdb=edb;
+                }
 
+            }while (change);
+            affiche_Edb(edb);
+        }
+    }
     public ArrayList<ArrayList<String>> getParam(String name, ArrayList<Relation> edb) {
         ArrayList<ArrayList<String>> actual = new ArrayList<>();
         edb.forEach(relation -> {
@@ -304,7 +282,6 @@ public final class Work {
                     if (actual.size() < attri.length) {
                         actual.add(new ArrayList<>());
                     }
-
                     actual.get(i).add(attri[i]);
                 }
             }
@@ -313,12 +290,27 @@ public final class Work {
         return actual;
     }
 
+    public void affiche_Edb(ArrayList<Relation> edb){
+        String canard ="";
+        for (Relation r : edb){
+
+            for (int i = 0; i<r.getAttributes().length;i++){
+                canard+= r.getAttributes()[i]+" | ";
+            }
+            System.out.println(r.getName()+"      :"    +canard);
+            canard="";
+        }
+
+    }
+
+
     public ArrayList<Relation> eval(Tgd clause, ArrayList<Relation> edb) {
         //initialisation du résultat
         ArrayList<Boolean> flags = new ArrayList<>();
-
+        HashMap<String, HashMap<String, ArrayList<String>>> result= new HashMap<>();
         //pour chaque litteraux
-        clause.getLeft().forEach(literal -> {
+
+        for (Literal literal : clause.getLeft()){
             flags.add(literal.getFlag());
             //on récupères les nom des variables
             Atom atom = literal.getAtom();
@@ -326,34 +318,36 @@ public final class Work {
             //on récupère la liste des faits correspondants pour cette relation
             ArrayList<ArrayList<String>> param = getParam(atom.getName(), edb);
             //pour chaque relation
-            this.result.put(atom.getName(), new HashMap<>());
-            System.out.println(param);
+            result.put(atom.getName(), new HashMap<>());
+
             //on assigne les faits possibles aux différentes variables correspondantes
             for (int i = 0; i < param.size(); i++) {
                 Variable temp = (Variable) args[i];
-                this.result.get(atom.getName()).put(temp.getName(), param.get(i));
+                result.get(atom.getName()).put(temp.getName(), param.get(i));
             }
-
-        });
+          //  System.out.println(" 2 "+result);
+        }
 
         HashSet<String> vals = new HashSet<>();
         //on récupère le nom toutes les variables de la clause
-        for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : this.result.entrySet()) {
+        for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : result.entrySet()) {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
         }
-
+        HashSet<String> va = new HashSet<>(vals);
         HashMap<String, ArrayList<String>> last = new HashMap<>();
         //pour chaque variables
-        for (String s : vals) {
+        for (String s : va) {
             //on récupère toutes les valeurs possible pour chaque relation
-            ArrayList<ArrayList<String>> temp = merge(this.result, s);
+            ArrayList<ArrayList<String>> temp = merge(result, s);
 
             //on ne garde que celles qui correspondent
             ArrayList<String> variable = combine(temp, flags);
-            clear(this.result, variable, s);
+            clear(result, variable, s);
             //on les ajoute au résultats
             last.put(s, variable);
         }
+      //  System.out.println("3" + last);
+
         Atom head = clause.getRight();
         ArrayList<Variable> vars = (ArrayList<Variable>) head.getVars();
         ArrayList<Relation> end = new ArrayList<>();
@@ -381,10 +375,6 @@ public final class Work {
             }
         }
         edb.addAll(end);
-        System.out.println("Result");
-        ArrayList<ArrayList<String>> disp = this.getParam(head.getName(), edb);
-//        System.out.println(disp.get(0));
-        System.out.println(this.result);
         return edb;
     }
 
@@ -469,7 +459,6 @@ public final class Work {
                 }
             }
             removeIt(toDel, entry.getValue(), var);
-
             toDel.clear();
         }
     }
@@ -480,6 +469,7 @@ public final class Work {
             index = getIndex(data, var, del);
             for (Map.Entry<String, ArrayList<String>> entry : data.entrySet()) {
                 entry.getValue().remove(index);
+
             }
         }
     }
@@ -494,7 +484,4 @@ public final class Work {
         return res;
     }
 
-    public void test() {
-        this.evalPartition(this.partitions.get(1), (ArrayList) this.m.getEDB());
-    }
 }

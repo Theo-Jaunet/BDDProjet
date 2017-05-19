@@ -28,19 +28,17 @@ public class App {
                 m.getEDB().size(),
                 m.getIDB().size(),
                 m.getTgds().size());
-        System.out.println(m.getEDB().size());
+        //System.out.println(m.getEDB().size());
 
         Object[] canard = m.getTgds().toArray();
         Tgd temp = (Tgd) canard[4];
         for (Literal lit: temp.getLeft()) {
-            System.out.println(lit.getAtom().getName());
-            System.out.println(lit.getFlag());
+            //System.out.println(lit.getAtom().getName());
+            //System.out.println(lit.getFlag());
         }
         Work w = new Work(m);
-        w.eval((Tgd) canard[0], (ArrayList<Relation>) m.getEDB());
-       temp.getRight().getVars().forEach(variable -> {
-           System.out.println(variable.getName());
-       });
+       // w.eval((Tgd) canard[0], (ArrayList<Relation>) m.getEDB());
+        w.megaEval((ArrayList<Relation>)m.getEDB());
 
     }
 }
