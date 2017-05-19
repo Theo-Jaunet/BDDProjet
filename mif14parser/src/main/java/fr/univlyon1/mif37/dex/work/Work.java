@@ -21,6 +21,7 @@ public final class Work {
     String type;
     HashMap<String, Integer> stratum;
     HashMap<Integer, ArrayList<Tgd>> partitions;
+    HashMap<String, HashMap<String, ArrayList<String>>> result;
 
     public Mapping getM() {
         return m;
@@ -41,6 +42,7 @@ public final class Work {
         this.type = characterize();
         this.stratification();
         this.partitioning();
+        this.result = new HashMap<>();
     }
 
     private String characterize() {
@@ -313,7 +315,6 @@ public final class Work {
 
     public ArrayList<Relation> eval(Tgd clause, ArrayList<Relation> edb) {
         //initialisation du résultat
-        HashMap<String, HashMap<String, ArrayList<String>>> result = new HashMap<>();
         ArrayList<Boolean> flags = new ArrayList<>();
 
         //pour chaque litteraux
@@ -325,33 +326,34 @@ public final class Work {
             //on récupère la liste des faits correspondants pour cette relation
             ArrayList<ArrayList<String>> param = getParam(atom.getName(), edb);
             //pour chaque relation
-            result.put(atom.getName(), new HashMap<>());
+            this.result.put(atom.getName(), new HashMap<>());
             System.out.println(param);
             //on assigne les faits possibles aux différentes variables correspondantes
             for (int i = 0; i < param.size(); i++) {
                 Variable temp = (Variable) args[i];
-                result.get(atom.getName()).put(temp.getName(), param.get(i));
+                this.result.get(atom.getName()).put(temp.getName(), param.get(i));
             }
 
         });
-        
+
         ArrayList<String> vals = new ArrayList<>();
         //on récupère le nom toutes les variables de la clause
-        for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : result.entrySet()) {
+        for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : this.result.entrySet()) {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
         }
-        
-        HashMap<String,ArrayList<String>> last = new HashMap<>();
+
+        HashMap<String, ArrayList<String>> last = new HashMap<>();
         //pour chaque variables
-        vals.forEach(s -> {
+        for (String s : vals) {
             //on récupère toutes les valeurs possible pour chaque relation
-            ArrayList<ArrayList<String>> temp = merge(result,s);
-            
+            ArrayList<ArrayList<String>> temp = merge(this.result, s);
+
             //on ne garde que celles qui correspondent
             ArrayList<String> variable = combine(temp, flags);
+            clear(this.result, variable, s);
             //on les ajoute au résultats
-            last.put(s,variable);
-        });
+            last.put(s, variable);
+        }
         Atom head = clause.getRight();
         ArrayList<Variable> vars = (ArrayList<Variable>) head.getVars();
         ArrayList<Relation> end = new ArrayList<>();
@@ -381,9 +383,11 @@ public final class Work {
         edb.addAll(end);
         System.out.println("Result");
         ArrayList<ArrayList<String>> disp = this.getParam(head.getName(), edb);
-        System.out.println(disp.get(0));
+//        System.out.println(disp.get(0));
+        System.out.println(this.result);
         return edb;
     }
+
     //creation d'une "matrice" correspondant à une variable, chaque ligne contient
     //les valeurs possibles de cette variable pour une relation qui l'utilise
     public ArrayList<ArrayList<String>> merge(HashMap<String, HashMap<String, ArrayList<String>>> data, String var) {
@@ -397,6 +401,7 @@ public final class Work {
         }
         return temp;
     }
+
     //à partir de la matrice précédente, on ne garde que les valeurs contenues dans chaque ligne
     public ArrayList<String> combine(ArrayList<ArrayList<String>> data, ArrayList<Boolean> flags) {
         ArrayList<String> res = new ArrayList<>();
@@ -407,23 +412,23 @@ public final class Work {
         Boolean arrayFlag;
         String val = "";
         //on recherche un terme positif de la clause
-        for(int j = 0; j<flags.size(); j++){
-            if(flags.get(j)){
+        for (int j = 0; j < flags.size(); j++) {
+            if (flags.get(j)) {
                 ref = j;
                 break;
             }
-        }     
+        }
 
         while (!data.get(0).isEmpty()) {
             nb = 1;
             //on selectionne une valeur arbitraire
             val = data.get(ref).get(0);
             for (int j = 0; j < check; j++) {
-                if(j!=ref){
+                if (j != ref) {
                     arrayFlag = flags.get(j);
                     it = data.get(j).size();
 
-                    if((data.get(j).contains(val) && arrayFlag) || (!data.get(j).contains(val) && !arrayFlag) ){
+                    if ((data.get(j).contains(val) && arrayFlag) || (!data.get(j).contains(val) && !arrayFlag)) {
                         nb++;
                         data.get(j).remove(val);
                         break;
@@ -441,7 +446,7 @@ public final class Work {
 
             }
             //si on a trouver cette valeur dans toutes les lignes, on l'ajoute au resultat
-            if(nb==check){
+            if (nb == check) {
                 res.add(data.get(0).get(0));
             }
             //on l'enlève de la colonne.
@@ -463,13 +468,13 @@ public final class Work {
                     });
                 }
             }
-            removeIt(toDel,entry.getValue(),var);
+            removeIt(toDel, entry.getValue(), var);
+
             toDel.clear();
         }
-
     }
 
-    public HashMap<String, ArrayList<String>> removeIt(ArrayList<String> todel, HashMap<String, ArrayList<String>> data, String var) {
+    public void removeIt(ArrayList<String> todel, HashMap<String, ArrayList<String>> data, String var) {
         int index;
         for (String del : todel) {
             index = getIndex(data, var, del);
@@ -477,7 +482,6 @@ public final class Work {
                 entry.getValue().remove(index);
             }
         }
-        return data;
     }
 
     public int getIndex(HashMap<String, ArrayList<String>> data, String var, String del) {
