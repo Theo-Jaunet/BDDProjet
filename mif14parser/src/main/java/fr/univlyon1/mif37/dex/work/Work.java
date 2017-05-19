@@ -333,10 +333,10 @@ public final class Work {
         for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : result.entrySet()) {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
         }
-        HashSet<String> va = new HashSet<>(vals);
+        
         HashMap<String, ArrayList<String>> last = new HashMap<>();
         //pour chaque variables
-        for (String s : va) {
+        for (String s : vals) {
             //on récupère toutes les valeurs possible pour chaque relation
             ArrayList<ArrayList<String>> temp = merge(result, s);
 
