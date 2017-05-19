@@ -312,29 +312,44 @@ public final class Work {
     }
 
     public void eval(Tgd clause, ArrayList<Relation> edb) {
+        //initialisation du résultat
         HashMap<String, HashMap<String, ArrayList<String>>> result = new HashMap<>();
+        ArrayList<Boolean> flags = new ArrayList<>();
+
+        //pour chaque litteraux
         clause.getLeft().forEach(literal -> {
+            flags.add(literal.getFlag());
+            //on récupères les nom des variables
             Atom atom = literal.getAtom();
             Object[] args = atom.getVars().toArray();
+            //on récupère la liste des faits correspondants pour cette relation
             ArrayList<ArrayList<String>> param = getParam(atom.getName(), edb);
+            //pour chaque relation
             result.put(atom.getName(), new HashMap<>());
             System.out.println(param);
-
+            //on assigne les faits possibles aux différentes variables correspondantes
             for (int i = 0; i < param.size(); i++) {
                 Variable temp = (Variable) args[i];
                 result.get(atom.getName()).put(temp.getName(), param.get(i));
             }
 
         });
+        
         ArrayList<String> vals = new ArrayList<>();
+        //on récupère le nom toutes les variables de la clause
         for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : result.entrySet()) {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
-
         }
+        
         HashMap<String,ArrayList<String>> last = new HashMap<>();
+        //pour chaque variables
         vals.forEach(s -> {
+            //on récupère toutes les valeurs possible pour chaque relation
             ArrayList<ArrayList<String>> temp = merge(result,s);
-            ArrayList<String> variable = combine(temp);
+            
+            //on ne garde que celles qui correspondent
+            ArrayList<String> variable = combine(temp, flags);
+            //on les ajoute au résultats
             last.put(s,variable);
         });
         Atom head = clause.getRight();
@@ -368,7 +383,8 @@ public final class Work {
         ArrayList<ArrayList<String>> disp = this.getParam(head.getName(),edb);
         System.out.println(disp.get(0));
     }
-
+    //creation d'une "matrice" correspondant à une variable, chaque ligne contient
+    //les valeurs possibles de cette variable pour une relation qui l'utilise
     public ArrayList<ArrayList<String>> merge(HashMap<String, HashMap<String, ArrayList<String>>> data, String var) {
         ArrayList<ArrayList<String>> temp = new ArrayList<>();
         for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : data.entrySet()) {
@@ -380,34 +396,56 @@ public final class Work {
         }
     return temp;
     }
-
-    public ArrayList<String> combine(ArrayList<ArrayList<String>> data) {
+    //à partir de la matrice précédente, on ne garde que les valeurs contenues dans chaque ligne
+    public ArrayList<String> combine(ArrayList<ArrayList<String>> data, ArrayList<Boolean> flags) {
         ArrayList<String> res = new ArrayList<>();
         int check = data.size();
-        int it = data.get(0).size();
+        int it = 0;
         int nb = 1;
+        int ref = 0;
+        Boolean arrayFlag;
         String val = "";
-        while (!data.get(0).isEmpty()) {
-            val = data.get(0).get(0);
+        //on recherche un terme positif de la clause
+        for(int j = 0; j<flags.size(); j++){
+            if(flags.get(j)){
+                ref = j;
+                break;
+            }
+        }     
 
-            for (int j = 1; j < check; j++) {
-                for (int u = 0; u < it; u++) {
-                    if (data.get(j).get(u) == val) {
+        while (!data.get(0).isEmpty()) {
+            nb = 1;
+            //on selectionne une valeur arbitraire
+            val = data.get(ref).get(0);
+            for (int j = 0; j < check; j++) {
+                if(j!=ref){
+                    arrayFlag = flags.get(j);
+                    it = data.get(j).size();
+
+                    if((data.get(j).contains(val) && arrayFlag) || (!data.get(j).contains(val) && !arrayFlag) ){
                         nb++;
-                        data.get(j).remove(u);
+                        data.get(j).remove(val);
                         break;
                     }
                 }
+                /*for (int u = 0; u < it; u++) {
+                    //si cette valeur est contenue dans une autre ligne on incrémente le compteur
+                    if (data.get(j).get(u) == val) {
+                        nb++;
+                        //et on la supprime (pour l'optimisation)
+                        data.get(j).remove(u);
+                        break;
+                    }
+                }*/
 
             }
+            //si on a trouver cette valeur dans toutes les lignes, on l'ajoute au resultat
             if(nb==check){
-                nb=1;
                 res.add(data.get(0).get(0));
-                data.get(0).remove(0);
             }
+            //on l'enlève de la colonne.
+            data.get(0).remove(0);
         }
-
-
         return res;
     }
 
