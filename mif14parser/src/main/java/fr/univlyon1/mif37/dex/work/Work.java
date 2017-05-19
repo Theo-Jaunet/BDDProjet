@@ -336,7 +336,7 @@ public final class Work {
 
         });
 
-        ArrayList<String> vals = new ArrayList<>();
+        HashSet<String> vals = new HashSet<>();
         //on récupère le nom toutes les variables de la clause
         for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : this.result.entrySet()) {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
