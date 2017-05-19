@@ -26,15 +26,14 @@
       <file leaf-file-name="Work.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/work/Work.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1508">
-              <caret line="474" column="5" selection-start-line="474" selection-start-column="5" selection-end-line="474" selection-end-column="5" />
+            <state relative-caret-position="-808">
+              <caret line="299" column="57" selection-start-line="299" selection-start-column="57" selection-end-line="299" selection-end-column="57" />
               <folding>
-                <marker date="1495194031404" expanded="false" signature="681:692" ph=" { " />
-                <marker date="1495194031404" expanded="false" signature="701:707" ph=" }" />
-                <marker date="1495194031404" expanded="false" signature="759:765" ph=" }" />
-                <marker date="1495194031404" expanded="false" signature="815:826" ph=" { " />
-                <marker date="1495194031404" expanded="false" signature="841:847" ph=" }" />
-                <marker date="1495194031404" expanded="false" signature="7346:8569" ph="{...}" />
+                <marker date="1495200583900" expanded="false" signature="618:629" ph=" { " />
+                <marker date="1495200583900" expanded="false" signature="638:644" ph=" }" />
+                <marker date="1495200583900" expanded="false" signature="696:702" ph=" }" />
+                <marker date="1495200583900" expanded="false" signature="752:763" ph=" { " />
+                <marker date="1495200583900" expanded="false" signature="778:784" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -75,8 +74,8 @@
       <file leaf-file-name="sample-mapping.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sample-mapping.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+            <state relative-caret-position="360">
+              <caret line="20" column="50" selection-start-line="20" selection-start-column="50" selection-end-line="20" selection-end-column="50" />
               <folding />
             </state>
           </provider>
@@ -131,8 +130,8 @@
       <file leaf-file-name="App.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/App.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
+            <state relative-caret-position="308">
+              <caret line="34" column="43" selection-start-line="34" selection-start-column="43" selection-end-line="34" selection-end-column="43" />
               <folding />
             </state>
           </provider>
@@ -149,8 +148,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/mapping/Relation.java" />
-        <option value="$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/App.java" />
         <option value="$PROJECT_DIR$/sample-mapping.txt" />
+        <option value="$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/App.java" />
         <option value="$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/work/Work.java" />
       </list>
     </option>
@@ -842,12 +841,12 @@
       <option name="presentableId" value="Default" />
       <updated>1495109606698</updated>
       <workItem from="1495109609531" duration="10701000" />
-      <workItem from="1495176799360" duration="12485000" />
+      <workItem from="1495176799360" duration="18783000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23186000" />
+    <option name="totallyTimeSpent" value="29484000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="30" width="1920" height="1050" extended-state="6" />
@@ -861,7 +860,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980973" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32980973" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -870,7 +869,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.39957717" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39957717" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -920,21 +919,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/work/Work.java</url>
-          <line>386</line>
-          <properties />
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/work/Work.java</url>
-          <line>481</line>
-          <properties />
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="6" />
+      <option name="time" value="13" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -948,12 +933,11 @@
         <state relative-caret-position="2898">
           <caret line="177" column="7" selection-start-line="177" selection-start-column="7" selection-end-line="177" selection-end-column="7" />
           <folding>
-            <marker date="1495194031404" expanded="false" signature="681:692" ph=" { " />
-            <marker date="1495194031404" expanded="false" signature="701:707" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="759:765" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="815:826" ph=" { " />
-            <marker date="1495194031404" expanded="false" signature="841:847" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="7346:8569" ph="{...}" />
+            <marker date="1495200583900" expanded="false" signature="618:629" ph=" { " />
+            <marker date="1495200583900" expanded="false" signature="638:644" ph=" }" />
+            <marker date="1495200583900" expanded="false" signature="696:702" ph=" }" />
+            <marker date="1495200583900" expanded="false" signature="752:763" ph=" { " />
+            <marker date="1495200583900" expanded="false" signature="778:784" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -1108,14 +1092,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/mapping/Variable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
@@ -1124,25 +1100,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="34" column="43" selection-start-line="34" selection-start-column="43" selection-end-line="34" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sample-mapping.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+        <state relative-caret-position="360">
+          <caret line="20" column="50" selection-start-line="20" selection-start-column="50" selection-end-line="20" selection-end-column="50" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/work/Work.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1508">
-          <caret line="474" column="5" selection-start-line="474" selection-start-column="5" selection-end-line="474" selection-end-column="5" />
+        <state relative-caret-position="-808">
+          <caret line="299" column="57" selection-start-line="299" selection-start-column="57" selection-end-line="299" selection-end-column="57" />
           <folding>
-            <marker date="1495194031404" expanded="false" signature="681:692" ph=" { " />
-            <marker date="1495194031404" expanded="false" signature="701:707" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="759:765" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="815:826" ph=" { " />
-            <marker date="1495194031404" expanded="false" signature="841:847" ph=" }" />
-            <marker date="1495194031404" expanded="false" signature="7346:8569" ph="{...}" />
+            <marker date="1495200583900" expanded="false" signature="618:629" ph=" { " />
+            <marker date="1495200583900" expanded="false" signature="638:644" ph=" }" />
+            <marker date="1495200583900" expanded="false" signature="696:702" ph=" }" />
+            <marker date="1495200583900" expanded="false" signature="752:763" ph=" { " />
+            <marker date="1495200583900" expanded="false" signature="778:784" ph=" }" />
           </folding>
         </state>
       </provider>
