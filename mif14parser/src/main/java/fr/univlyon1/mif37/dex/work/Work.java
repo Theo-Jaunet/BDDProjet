@@ -311,7 +311,12 @@ public final class Work {
         return actual;
     }
 
-    public void eval(Tgd clause, ArrayList<Relation> edb) {
+    public void megaEval(ArrayList<Relation> edb) {
+
+
+    }
+
+    public ArrayList<Relation> eval(Tgd clause, ArrayList<Relation> edb) {
         HashMap<String, HashMap<String, ArrayList<String>>> result = new HashMap<>();
         clause.getLeft().forEach(literal -> {
             Atom atom = literal.getAtom();
@@ -331,11 +336,11 @@ public final class Work {
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
 
         }
-        HashMap<String,ArrayList<String>> last = new HashMap<>();
+        HashMap<String, ArrayList<String>> last = new HashMap<>();
         vals.forEach(s -> {
-            ArrayList<ArrayList<String>> temp = merge(result,s);
+            ArrayList<ArrayList<String>> temp = merge(result, s);
             ArrayList<String> variable = combine(temp);
-            last.put(s,variable);
+            last.put(s, variable);
         });
         Atom head = clause.getRight();
         ArrayList<Variable> vars = (ArrayList<Variable>) head.getVars();
@@ -344,16 +349,16 @@ public final class Work {
 
         for (Map.Entry<String, ArrayList<String>> entry : last.entrySet()) {
 
-            if(vars.get(i).getName().equals(entry.getKey())){
+            if (vars.get(i).getName().equals(entry.getKey())) {
                 int it = 0;
-                for (String s : entry.getValue()){
+                for (String s : entry.getValue()) {
 
-                    if(i==0) {
+                    if (i == 0) {
                         ArrayList<String> temp = new ArrayList<>();
                         temp.add(s);
-                        end.add(new Relation(head.getName(),temp));
-                    }else{
-                       ArrayList<String> temp =  (ArrayList<String>) Arrays.asList(end.get(it).getAttributes());
+                        end.add(new Relation(head.getName(), temp));
+                    } else {
+                        ArrayList<String> temp = (ArrayList<String>) Arrays.asList(end.get(it).getAttributes());
                         temp.add(s);
                         String[] res = (String[]) temp.toArray();
                         end.get(it).setAttributes(res);
@@ -364,9 +369,10 @@ public final class Work {
             }
         }
         edb.addAll(end);
-        System.out.println("LLLLAAAAAAA");
-        ArrayList<ArrayList<String>> disp = this.getParam(head.getName(),edb);
+        System.out.println("Result");
+        ArrayList<ArrayList<String>> disp = this.getParam(head.getName(), edb);
         System.out.println(disp.get(0));
+        return edb;
     }
 
     public ArrayList<ArrayList<String>> merge(HashMap<String, HashMap<String, ArrayList<String>>> data, String var) {
@@ -378,7 +384,7 @@ public final class Work {
                 }
             }
         }
-    return temp;
+        return temp;
     }
 
     public ArrayList<String> combine(ArrayList<ArrayList<String>> data) {
@@ -400,17 +406,54 @@ public final class Work {
                 }
 
             }
-            if(nb==check){
-                nb=1;
+            if (nb == check) {
+                nb = 1;
                 res.add(data.get(0).get(0));
                 data.get(0).remove(0);
             }
         }
-
-
         return res;
     }
 
+    public void clear(HashMap<String, HashMap<String, ArrayList<String>>> data, ArrayList<String> checked, String var) {
+        ArrayList<String> toDel = new ArrayList<>();
+        for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : data.entrySet()) {
+            for (Map.Entry<String, ArrayList<String>> entry2 : entry.getValue().entrySet()) {
+                if (entry2.getKey().equals(var)) {
+                    entry2.getValue().forEach(s -> {
+                        if (!checked.contains(s)) {
+                            toDel.add(entry2.getValue().get(entry2.getValue().indexOf(s)));
+                            //removeIt(entry2.getValue().indexOf(s),entry.getValue());
+                        }
+                    });
+                }
+            }
+            removeIt(toDel,entry.getValue(),var);
+            toDel.clear();
+        }
+
+    }
+
+    public HashMap<String, ArrayList<String>> removeIt(ArrayList<String> todel, HashMap<String, ArrayList<String>> data, String var) {
+        int index;
+        for (String del : todel) {
+            index = getIndex(data, var, del);
+            for (Map.Entry<String, ArrayList<String>> entry : data.entrySet()) {
+                entry.getValue().remove(index);
+            }
+        }
+        return data;
+    }
+
+    public int getIndex(HashMap<String, ArrayList<String>> data, String var, String del) {
+        int res = 0;
+        for (Map.Entry<String, ArrayList<String>> entry : data.entrySet()) {
+            if (entry.getKey().equals(var)) {
+                res = entry.getValue().indexOf(del);
+            }
+        }
+        return res;
+    }
 
     public void test() {
         this.evalPartition(this.partitions.get(1), (ArrayList) this.m.getEDB());
