@@ -2,14 +2,18 @@ package fr.univlyon1.mif37.dex;
 
 import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
+import fr.univlyon1.mif37.dex.mapping.Relation;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
 import fr.univlyon1.mif37.dex.parser.MappingParser;
 import fr.univlyon1.mif37.dex.parser.ParseException;
+import fr.univlyon1.mif37.dex.work.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -28,10 +32,15 @@ public class App {
 
         Object[] canard = m.getTgds().toArray();
         Tgd temp = (Tgd) canard[4];
-
         for (Literal lit: temp.getLeft()) {
             System.out.println(lit.getAtom().getName());
             System.out.println(lit.getFlag());
         }
+        Work w = new Work(m);
+        w.eval((Tgd) canard[0], (ArrayList<Relation>) m.getEDB());
+       temp.getRight().getVars().forEach(variable -> {
+           System.out.println(variable.getName());
+       });
+
     }
 }

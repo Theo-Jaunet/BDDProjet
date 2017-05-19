@@ -19,6 +19,10 @@ public class Relation {
         return name;
     }
 
+    public void setAttributes(String[] attributes) {
+        this.attributes = attributes;
+    }
+
     public String[] getAttributes() {
         return attributes;
     }
