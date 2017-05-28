@@ -26,4 +26,12 @@ public class Relation {
     public String[] getAttributes() {
         return attributes;
     }
+
+    public void show_you(){
+        String mes = name+ " : ";
+        for(int i =0;i< attributes.length;i++){
+            mes += attributes[i]+ " | ";
+        }
+        System.out.println(mes);
+    }
 }

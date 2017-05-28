@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="H2 - gdw" uuid="2a37b8d8-ea82-4bb4-8233-7486550644fc">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:$PROJECT_DIR$/src/main/java/fr/univlyon1/mif37/dex/jdbc:h2:~/gdw</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="H2 - gdw [2]" uuid="0281d5fb-d5e5-424c-9d3d-977d624d6dfe">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:~/gdw/gdw</jdbc-url>
+    </data-source>
+  </component>
+</project>

@@ -1,5 +1,6 @@
 package fr.univlyon1.mif37.dex.work;
 
+import com.sun.javafx.runtime.async.AsyncOperationListener;
 import fr.univlyon1.mif37.dex.mapping.Atom;
 import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
@@ -21,7 +22,11 @@ public final class Work {
     String type;
     HashMap<String, Integer> stratum;
     HashMap<Integer, ArrayList<Tgd>> partitions;
+    ArrayList<Relation> final_edb;
 
+    public ArrayList<Relation> getFinal_edb() {
+        return final_edb;
+    }
 
     public Mapping getM() {
         return m;
@@ -42,6 +47,7 @@ public final class Work {
         this.type = characterize();
         this.stratification();
         this.partitioning();
+        this.final_edb = this.megaEval((ArrayList<Relation>)m.getEDB());
     }
 
     private String characterize() {
@@ -254,24 +260,27 @@ public final class Work {
         );
     }
 
-    public void megaEval(ArrayList<Relation> edb){
+    public ArrayList<Relation> megaEval(ArrayList<Relation> edb) {
         ArrayList<Relation> oldEdb = new ArrayList<>(edb);
         Boolean change = true;
         for (Map.Entry<Integer, ArrayList<Tgd>> entry : this.partitions.entrySet()) {
             do {
-                for (Tgd clause : entry.getValue()){
-                    edb =this.eval(clause,edb);
+                for (Tgd clause : entry.getValue()) {
+                    edb = this.eval(clause, edb);
                 }
-                if(edb.equals(oldEdb)){
-                    change=false;
-                }else{
-                    oldEdb=edb;
+                if (edb.size() == oldEdb.size()) {
+                    change = false;
+                } else {
+                    oldEdb = edb;
                 }
 
-            }while (change);
-            affiche_Edb(edb);
+            } while (change);
+            System.out.println("Changement de Partition");
         }
+        affiche_Edb(edb);
+        return edb;
     }
+
     public ArrayList<ArrayList<String>> getParam(String name, ArrayList<Relation> edb) {
         ArrayList<ArrayList<String>> actual = new ArrayList<>();
         edb.forEach(relation -> {
@@ -290,90 +299,107 @@ public final class Work {
         return actual;
     }
 
-    public void affiche_Edb(ArrayList<Relation> edb){
-        String canard ="";
-        for (Relation r : edb){
-
-            for (int i = 0; i<r.getAttributes().length;i++){
-                canard+= r.getAttributes()[i]+" | ";
-            }
-            System.out.println(r.getName()+"      :"    +canard);
-            canard="";
+    public void affiche_Edb(ArrayList<Relation> edb) {
+        System.out.println("------------EDB-------------");
+        for (Relation r : edb) {
+            r.show_you();
         }
-
     }
-
 
     public ArrayList<Relation> eval(Tgd clause, ArrayList<Relation> edb) {
         //initialisation du résultat
-        ArrayList<Boolean> flags = new ArrayList<>();
-        HashMap<String, HashMap<String, ArrayList<String>>> result= new HashMap<>();
-        //pour chaque litteraux
+        HashMap<String, ArrayList<Boolean>> flags = new HashMap<>();
+        HashMap<String, HashMap<String, ArrayList<String>>> result = new HashMap<>();
 
-        for (Literal literal : clause.getLeft()){
-            flags.add(literal.getFlag());
+        ArrayList<String> vals = new ArrayList<>();
+
+
+        //pour chaque litteraux
+        for (Literal literal : clause.getLeft()) {
             //on récupères les nom des variables
             Atom atom = literal.getAtom();
+
             Object[] args = atom.getVars().toArray();
             //on récupère la liste des faits correspondants pour cette relation
             ArrayList<ArrayList<String>> param = getParam(atom.getName(), edb);
             //pour chaque relation
-            result.put(atom.getName(), new HashMap<>());
-
+            if (!result.containsKey(atom.getName())) {
+                result.put(atom.getName(), new HashMap<>());
+            }
             //on assigne les faits possibles aux différentes variables correspondantes
             for (int i = 0; i < param.size(); i++) {
                 Variable temp = (Variable) args[i];
                 result.get(atom.getName()).put(temp.getName(), param.get(i));
             }
-          //  System.out.println(" 2 "+result);
         }
 
-        ArrayList<String> vals = new ArrayList<>();
         //on récupère le nom toutes les variables de la clause
         for (Map.Entry<String, HashMap<String, ArrayList<String>>> entry : result.entrySet()) {
+
             vals.addAll(entry.getValue().entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
         }
+
+
         HashSet<String> va = new HashSet<>(vals);
         HashMap<String, ArrayList<String>> last = new HashMap<>();
         //pour chaque variables
+        ArrayList<Boolean> tempo = new ArrayList<>();
         for (String s : va) {
+            tempo.clear();
+            for (Literal literal : clause.getLeft()) {
+                for (Variable v : literal.getAtom().getVars()) {
+                    if (v.getName().equals(s)) {
+                        tempo.add(literal.getFlag());
+                        break;
+                    }
+                }
+            }
             //on récupère toutes les valeurs possible pour chaque relation
             ArrayList<ArrayList<String>> temp = merge(result, s);
-
             //on ne garde que celles qui correspondent
-            ArrayList<String> variable = combine(temp, flags);
+            ArrayList<String> variable = combine(temp, tempo);
+            // System.out.println(variable +" de "+ hh);
             clear(result, variable, s);
             //on les ajoute au résultats
             last.put(s, variable);
         }
-      //  System.out.println("3" + last);
+        //  System.out.println(result);
+        //  System.out.println("3" + last);
 
         Atom head = clause.getRight();
         ArrayList<Variable> vars = (ArrayList<Variable>) head.getVars();
         ArrayList<Relation> end = new ArrayList<>();
-        int i = 0;
+
+        last = this.generateAndTest(edb, last, new ArrayList<>(clause.getLeft()));
+
+        int nb = last.get(vars.get(0).getName()).size();
+        ArrayList<String> temp = new ArrayList<>();
+
+        for (int y = 0; y < nb; y++) {
+            for (Variable var : vars) {
+                // System.out.println(var.getName() +" : "+last.get(var.getName()));
+                temp.add(last.get(var.getName()).get(y));
+            }
+            Relation toAdd = new Relation(head.getName(), temp);
+            if (!this.isInEdb(edb, toAdd) && !this.isInEdb(end, toAdd)) {
+                end.add(toAdd);
+            }
+            temp.clear();
+        }
+
+       /* ArrayList<String> attributs = new ArrayList<>();
+        ArrayList<ArrayList<String>> ok = new ArrayList<>();
+        ok.addAll(last.values());
+        ArrayList<String> keys = new ArrayList<>();
+        keys.addAll(last.keySet());
 
         for (Map.Entry<String, ArrayList<String>> entry : last.entrySet()) {
-
-            if (vars.get(i).getName().equals(entry.getKey())) {
-                int it = 0;
-                for (String s : entry.getValue()) {
-
-                    if (i == 0) {
-                        ArrayList<String> temp = new ArrayList<>();
-                        temp.add(s);
-                        end.add(new Relation(head.getName(), temp));
-                    } else {
-                        ArrayList<String> temp = (ArrayList<String>) Arrays.asList(end.get(it).getAttributes());
-                        temp.add(s);
-                        String[] res = (String[]) temp.toArray();
-                        end.get(it).setAttributes(res);
-                        it++;
-                    }
-
+            for (int w = 0; w < entry.getValue().size(); w++) {
+                for (int p = 0; p < keys.size(); p++) {
+                    attributs.add(ok.get(p).get(w));
                 }
             }
-        }
+        }*/
         edb.addAll(end);
         return edb;
     }
@@ -408,39 +434,41 @@ public final class Work {
                 break;
             }
         }
-
-        while (!data.get(0).isEmpty()) {
+        while (!data.get(ref).isEmpty()) {
             nb = 1;
             //on selectionne une valeur arbitraire
             val = data.get(ref).get(0);
             for (int j = 0; j < check; j++) {
                 if (j != ref) {
                     arrayFlag = flags.get(j);
-                    it = data.get(j).size();
+                    // && arrayFlag) || (!data.get(j).contains(val) && !arrayFlag)
+                    if (data.get(j).contains(val)) {
 
-                    if ((data.get(j).contains(val) && arrayFlag) || (!data.get(j).contains(val) && !arrayFlag)) {
-                        nb++;
-                        data.get(j).remove(val);
-                        break;
+                        if (arrayFlag) {
+                            nb++;
+                            data.get(j).remove(val);
+                            break;
+                        }
+                    } else {
+                        if (!arrayFlag) {
+                            data.get(j).remove(val);
+                            nb++;
+                            break;
+                        }
                     }
                 }
-                /*for (int u = 0; u < it; u++) {
-                    //si cette valeur est contenue dans une autre ligne on incrémente le compteur
-                    if (data.get(j).get(u) == val) {
-                        nb++;
-                        //et on la supprime (pour l'optimisation)
-                        data.get(j).remove(u);
-                        break;
-                    }
-                }*/
-
             }
             //si on a trouver cette valeur dans toutes les lignes, on l'ajoute au resultat
-            if (nb == check) {
-                res.add(data.get(0).get(0));
+            if (nb == check && !flags.contains(false)) {
+                res.add(data.get(ref).get(0));
+            } else {
+                if (!res.contains(data.get(ref).get(0))) {
+                    res.add(data.get(ref).get(0));
+                }
             }
+
             //on l'enlève de la colonne.
-            data.get(0).remove(0);
+            data.get(ref).remove(0);
         }
         return res;
     }
@@ -483,5 +511,137 @@ public final class Work {
         }
         return res;
     }
+
+    public boolean isok(HashMap<String, ArrayList<String>> data) {
+        int size = 0;
+        int temp = 0;
+        for (Map.Entry<String, ArrayList<String>> entry : data.entrySet()) {
+
+            temp = entry.getValue().size();
+            if (size == 0) {
+                size = temp;
+            }
+            if (temp != size) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public HashMap<String, ArrayList<String>> generateAndTest(ArrayList<Relation> edb, HashMap<String, ArrayList<String>> data, ArrayList<Literal> all) {
+        int size = -1;
+        int temp;
+        int it = 0;
+
+
+        HashMap<String, Integer> vars = new HashMap<>();
+        HashMap<String, ArrayList<String>> result = new HashMap<>();
+        String min = "";
+        ArrayList<ArrayList<String>> heu = new ArrayList<>();
+        for (Map.Entry<String, ArrayList<String>> entry : data.entrySet()) {
+
+            temp = entry.getValue().size();
+            if (size == -1) {
+                size = temp;
+            }
+            if (temp < size) {
+                min = entry.getKey();
+                size = temp;
+            }
+            heu.add(entry.getValue());
+            vars.put(entry.getKey(), it);
+            result.put(entry.getKey(), new ArrayList<>());
+            it++;
+        }
+
+        heu = cartesianProduct(heu);
+        ArrayList<String> op;
+        ArrayList<Relation> end = new ArrayList<>();
+        ArrayList<Variable> varst;
+        int tot = 0;
+        for (int u = 0; u < heu.size(); u++) {
+            op = heu.get(u);
+            tot = 0;
+            for (Literal lit : all) {
+                varst = (ArrayList<Variable>) lit.getAtom().getVars();
+                ArrayList<String> argus = new ArrayList<>();
+
+                for (Variable v : varst) {
+                    argus.add(op.get(vars.get(v.getName())));
+                }
+
+                Relation toTest = new Relation(lit.getAtom().getName(), argus);
+                if (all.size() == 3) {
+                    //System.out.println(op);
+                }
+                if (isInEdb(edb, toTest) && lit.getFlag()) {
+                    tot++;
+                    if (!isInEdb(end, toTest)) {
+                        end.add(toTest);
+                    }
+                } else if (!lit.getFlag() && !isInEdb(edb, toTest)) {
+                    tot++;
+                    toTest.show_you();
+                    if (!isInEdb(end, toTest)) {
+                        end.add(toTest);
+                    }
+                }
+            }
+            if (tot == all.size()) {
+                for (Map.Entry<String, Integer> entry : vars.entrySet()) {
+                    result.get(entry.getKey()).add(op.get(entry.getValue()));
+                }
+            }
+            //affiche_Edb(end);
+        }
+        return result;
+    }
+
+    public boolean isInEdb(ArrayList<Relation> edb, Relation test) {
+
+        for (int i = 0; i < edb.size(); i++) {
+            if (edb.get(i).getName().equals(test.getName()) && sameOrder(new ArrayList<>(Arrays.asList(edb.get(i).getAttributes())), new ArrayList<>(Arrays.asList(test.getAttributes())))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean sameOrder(ArrayList<String> s1, ArrayList<String> s2) {
+        int i = 0;
+        if (s1.size() == s2.size()) {
+            for (String s : s1) {
+                if (!s.equals(s2.get(i))) {
+                    return false;
+                }
+                i++;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ArrayList<ArrayList<String>> cartesianProduct(ArrayList<ArrayList<String>> lists) {
+        ArrayList<ArrayList<String>> resultLists = new ArrayList<>();
+        if (lists.size() == 0) {
+            resultLists.add(new ArrayList<>());
+            return resultLists;
+        } else {
+            ArrayList<String> firstList = lists.get(0);
+            ArrayList<ArrayList<String>> remainingLists = cartesianProduct(new ArrayList<>(lists.subList(1, lists.size())));
+            for (String condition : firstList) {
+                for (ArrayList<String> remainingList : remainingLists) {
+                    ArrayList<String> resultList = new ArrayList<>();
+                    resultList.add(condition);
+                    resultList.addAll(remainingList);
+                    resultLists.add(resultList);
+                }
+            }
+        }
+        return resultLists;
+    }
+
 
 }
